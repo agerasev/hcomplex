@@ -1,13 +1,21 @@
 use std::ops::{
     Neg, Add, Sub, Mul, Div, 
-    AddAssign, SubAssign, MulAssign, DivAssign,
+    // AddAssign, SubAssign, MulAssign, DivAssign,
 };
 use num_traits::{Num, Zero, One, Float, Signed};
 //use std::fmt::{Display, Formatter, Result as FmtResult};
 
+use std::marker::PhantomData;
+
+
 /// Something that can be conjugated
 pub trait Conj {
     fn conj(self) -> Self;
+}
+
+pub trait SqrAbs {
+    type Output: Float;
+    fn sqr_abs(self) -> Self::Output;
 }
 
 impl<T: Float> Conj for T {
@@ -16,16 +24,76 @@ impl<T: Float> Conj for T {
     }
 }
 
-/// Some algebra over real numbers (e.g. Float, Complex, Quaternion)
-pub trait Algebra: Copy + Neg<Output=Self> + Conj {}
+impl<T: Float> SqrAbs for T {
+    type Output = T;
+    fn sqr_abs(self) -> Self {
+        self*self
+    }
+}
 
-impl<T: Float> Algebra for T {}
+/// Some algebra over real numbers (e.g. Float, Complex, Quaternion)
+pub trait Algebra<T: Float>:
+    Copy +
+    Add<Output=Self> +
+    Sub<Output=Self> +
+    Neg<Output=Self> +
+    Conj +
+    SqrAbs<Output=T>
+{}
+
+impl<T: Float> Algebra<T> for T {}
 
 /// Cayley–Dickson construction
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct Construction<T: Algebra>(T, T);
+pub struct Construction<T: Float, A: Algebra<T>>(A, A, PhantomData<T>);
 
-impl<T: Algebra> Construction<T> {
+
+impl<T: Float, A: Algebra<T>> Conj for Construction<T, A> {
+    fn conj(self) -> Self {
+        Self(self.0.conj(), -self.1, PhantomData)
+    }
+}
+
+impl<T: Float, A: Algebra<T>> Neg for Construction<T, A> {
+    type Output = Self;
+    fn neg(self) -> Self::Output {
+        Self(-self.0, -self.1, PhantomData)
+    }
+}
+
+impl<T: Float, A: Algebra<T>> Add for Construction<T, A> {
+    type Output = Self;
+    fn add(self, other: Self) -> Self::Output {
+        Self(self.0 + other.0, self.1 + other.1, PhantomData)
+    }
+}
+
+impl<T: Float, A: Algebra<T>> Sub for Construction<T, A> {
+    type Output = Self;
+    fn sub(self, other: Self) -> Self::Output {
+        Self(self.0 - other.0, self.1 - other.1, PhantomData)
+    }
+}
+
+impl<T: Float, A: Algebra<T>> SqrAbs for Construction<T, A> {
+    type Output = T;
+    fn sqr_abs(self) -> T {
+        self.0.sqr_abs() + self.1.sqr_abs()
+    }
+}
+
+impl<T: Float, A: Algebra<T>> Construction<T, A> {
+    pub fn abs(self) -> T {
+        self.sqr_abs().sqrt()
+    }
+}
+
+impl<T: Float, A: Algebra<T>> Algebra<T> for Construction<T, A> {}
+
+// Fields and constructors
+
+/*
+impl<T: Float, A: Algebra<T>> Construction<T, A> {
     pub fn new2(re: T, im: T) -> Self {
         Self(re, im)
     }
@@ -40,22 +108,7 @@ impl<T: Algebra> Construction<T> {
     }
 }
 
-impl<T: Algebra> Conj for Construction<T> {
-    fn conj(self) -> Self {
-        Self::new2(self.re().conj(), -self.im())
-    }
-}
-
-impl<T: Algebra> Neg for Construction<T> {
-    type Output = Self;
-    fn neg(self) -> Self::Output {
-        Self::new2(-self.re(), -self.im())
-    }
-}
-
-impl<T: Algebra> Algebra for Construction<T> {}
-
-impl<T: Algebra> Construction<Construction<T>> {
+impl<T: Float, A: Algebra<T>> Construction<T, Construction<T, A>> {
     fn new4(w: T, x: T, y: T, z: T) -> Self {
         Self::new2(Construction::new2(w, x), Construction::new2(y, z))
     }
@@ -78,14 +131,16 @@ impl<T: Algebra> Construction<Construction<T>> {
     }
 }
 
+// Type aliases
+
 /// 2-dimensional commutative and associative algebra
-pub type Complex<T> = Construction<T>;
+pub type Complex<T> = Construction<T, T>;
 /// 4-dimensional associative but non-commutative algebra
-pub type Quaternion<T> = Construction<Construction<T>>;
+pub type Quaternion<T> = Construction<T, Construction<T, T>>;
 /// 8-dimensional non-commutative and non-associative algebra
-pub type Octonion<T> = Construction<Construction<Construction<T>>>;
+pub type Octonion<T> = Construction<T, Construction<T, Construction<T, T>>>;
 /// 16-dimensional non-commutative and non-associative algebra with nontrivial zero divisors
-pub type Sedenion<T> = Construction<Construction<Construction<Construction<T>>>>;
+pub type Sedenion<T> = Construction<T, Construction<T, Construction<T, Construction<T, T>>>>;
 
 #[cfg(test)]
 mod tests {
@@ -114,3 +169,4 @@ mod tests {
         assert_eq!(c.z(), -4.0);
     }
 }
+*/
