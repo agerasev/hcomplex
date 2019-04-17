@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod test;
+
 use std::ops::{
     Neg, Add, Sub, Mul, Div, 
     // AddAssign, SubAssign, MulAssign, DivAssign,
@@ -49,7 +52,7 @@ impl<T: Float> Algebra<T> for T {}
 
 /// Cayley–Dickson construction, a basic building block
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct Construction<T: Float, A: Algebra<T>>(A, A, PhantomData<T>);
+pub struct Construction<T: Float, A: Algebra<T>>(pub A, pub A, PhantomData<T>);
 
 impl<T: Float, A: Algebra<T>> Construction<T, A> {
     /// Create from two parts
@@ -210,76 +213,15 @@ impl<T: Float, A: Algebra<T>> Construction<T, Construction<T, A>> {
 /// 2-dimensional commutative and associative algebra
 pub type Complex<T> = Construction<T, T>;
 /// 4-dimensional associative but non-commutative algebra
-pub type Quaternion<T> = Construction<T, Construction<T, T>>;
+pub type Quaternion<T> = Construction<T, Complex<T>>;
 /// 8-dimensional non-commutative and non-associative algebra
-pub type Octonion<T> = Construction<T, Construction<T, Construction<T, T>>>;
+pub type Octonion<T> = Construction<T, Quaternion<T>>;
 /// 16-dimensional non-commutative and non-associative algebra with nontrivial zero divisors
-pub type Sedenion<T> = Construction<T, Construction<T, Construction<T, Construction<T, T>>>>;
+pub type Sedenion<T> = Construction<T, Octonion<T>>;
 
+/// Dummy test to force codecov take this file into account
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn new2() {
-        let c = Complex::<f32>::new2(1.0, 2.0);
-        assert_eq!(c.re(), 1.0);
-        assert_eq!(c.im(), 2.0);
-    }
-
-    #[test]
-    fn conj2() {
-        let c = Complex::<f32>::new2(1.0, 2.0).conj();
-        assert_eq!(c.re(), 1.0);
-        assert_eq!(c.im(), -2.0);
-    }
-
-    #[test]
-    fn conj4() {
-        let c = Quaternion::<f32>::new4(1.0, 2.0, 3.0, 4.0).conj();
-        assert_eq!(c.w(), 1.0);
-        assert_eq!(c.x(), -2.0);
-        assert_eq!(c.y(), -3.0);
-        assert_eq!(c.z(), -4.0);
-    }
-
-    #[test]
-    fn add2() {
-        let a = Complex::<f32>::new2(1.0, 2.0);
-        let b = Complex::<f32>::new2(3.0, 4.0);
-        let c = a + b;
-        assert_eq!(c.re(), 4.0);
-        assert_eq!(c.im(), 6.0);
-    }
-
-    #[test]
-    fn sub2() {
-        let a = Complex::<f32>::new2(2.0, 1.0);
-        let b = Complex::<f32>::new2(3.0, 4.0);
-        let c = a - b;
-        assert_eq!(c.re(), -1.0);
-        assert_eq!(c.im(), -3.0);
-    }
-
-    #[test]
-    fn add4() {
-        let a = Quaternion::<f32>::new4(1.0, 2.0, 3.0, 4.0);
-        let b = Quaternion::<f32>::new4(5.0, 6.0, 7.0, 8.0);
-        let c = a + b;
-        assert_eq!(c.w(), 6.0);
-        assert_eq!(c.x(), 8.0);
-        assert_eq!(c.y(), 10.0);
-        assert_eq!(c.z(), 12.0);
-    }
-
-    #[test]
-    fn sub4() {
-        let a = Quaternion::<f32>::new4(4.0, 3.0, 2.0, 1.0);
-        let b = Quaternion::<f32>::new4(5.0, 6.0, 7.0, 8.0);
-        let c = a - b;
-        assert_eq!(c.w(), -1.0);
-        assert_eq!(c.x(), -3.0);
-        assert_eq!(c.y(), -5.0);
-        assert_eq!(c.z(), -7.0);
-    }
+#[test]
+fn dummy() {
+    assert_eq!(1, 1);
 }
