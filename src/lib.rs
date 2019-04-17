@@ -2,10 +2,10 @@
 mod test;
 
 use std::ops::{
-    Neg, Add, Sub, Mul, Div, 
-    // AddAssign, SubAssign, MulAssign, DivAssign,
+    Neg, Add, Sub, Mul, Div, Rem, 
+    // AddAssign, SubAssign, MulAssign, DivAssign, RemAssign,
 };
-use num_traits::{Num, Zero, One, Float, Signed};
+use num_traits::{Num, Float, Zero, One, Inv};
 //use std::fmt::{Display, Formatter, Result as FmtResult};
 
 use std::marker::PhantomData;
@@ -16,6 +16,7 @@ pub trait Conj {
     fn conj(self) -> Self;
 }
 
+/// Square absolute value
 pub trait SqrAbs {
     type Output: Float;
     fn sqr_abs(self) -> Self::Output;
@@ -34,15 +35,13 @@ impl<T: Float> SqrAbs for T {
     }
 }
 
+
 /// Some algebra over real numbers (e.g. Float, Complex, Quaternion)
 pub trait Algebra<T: Float>:
     Copy +
-    Add<Output=Self> +
-    Sub<Output=Self> +
+    Num +
     Mul<T, Output=Self> +
     Div<T, Output=Self> +
-    Mul<Output=Self> +
-    Div<Output=Self> +
     Neg<Output=Self> +
     Conj +
     SqrAbs<Output=T>
@@ -69,7 +68,7 @@ impl<T: Float, A: Algebra<T>> Conj for Construction<T, A> {
 
 impl<T: Float, A: Algebra<T>> Neg for Construction<T, A> {
     type Output = Self;
-    fn neg(self) -> Self::Output {
+    fn neg(self) -> Self {
         Self::new2(-self.0, -self.1)
     }
 }
@@ -87,8 +86,6 @@ impl<T: Float, A: Algebra<T>> Sub for Construction<T, A> {
         Self::new2(self.0 - other.0, self.1 - other.1)
     }
 }
-
-// Multiplication and division
 
 impl<T: Float, A: Algebra<T>> Mul<T> for Construction<T, A> {
     type Output = Self;
@@ -117,9 +114,9 @@ impl<T: Float, A: Algebra<T>> Construction<T, A> {
     }
 }
 
-impl<T: Float, A: Algebra<T>> Construction<T, A> {
-    /// Inversion 1/x
-    pub fn inverse(self) -> Self {
+impl<T: Float, A: Algebra<T>> Inv for Construction<T, A> {
+    type Output = Self;
+    fn inv(self) -> Self {
         self.conj()/self.sqr_abs()
     }
 }
@@ -144,7 +141,7 @@ macro_rules! rdiv {
         impl<A: Algebra<$F>> Div<Construction<$F, A>> for $F {
             type Output = Construction<$F, A>;
             fn div(self, other: Construction<$F, A>) -> Self::Output {
-                other.inverse()*self
+                other.inv()*self
             }
         }
     )
@@ -165,16 +162,44 @@ impl<T: Float, A: Algebra<T>> Mul for Construction<T, A> {
 impl<T: Float, A: Algebra<T>> Div for Construction<T, A> {
     type Output = Self;
     fn div(self, other: Self) -> Self::Output {
-        self*other.inverse()
+        self*other.inv()
+    }
+}
+
+impl<T: Float, A: Algebra<T>> Zero for Construction<T, A> {
+    fn zero() -> Self {
+        Self::new2(A::zero(), A::zero())
+    }
+    fn is_zero(&self) -> bool {
+        self.0.is_zero() && self.1.is_zero()
+    }
+}
+
+impl<T: Float, A: Algebra<T>> One for Construction<T, A> {
+    fn one() -> Self {
+        Self::new2(A::one(), A::zero())
+    }
+}
+
+impl<T: Float, A: Algebra<T>> Rem for Construction<T, A> {
+    type Output = Self;
+    fn rem(self, _other: Self) -> Self::Output {
+        unimplemented!()
+    }
+}
+
+impl<T: Float, A: Algebra<T>> Num for Construction<T, A> {
+    type FromStrRadixErr = ();
+    fn from_str_radix(_str: &str, _radix: u32) -> Result<Self, Self::FromStrRadixErr> {
+        unimplemented!()
     }
 }
 
 impl<T: Float, A: Algebra<T>> Algebra<T> for Construction<T, A> {}
 
-// Fields
 
 impl<T: Float, A: Algebra<T>> Construction<T, A> {
-    #[inline] 
+    #[inline]
     pub fn re(self) -> A {
         self.0
     }
@@ -208,7 +233,6 @@ impl<T: Float, A: Algebra<T>> Construction<T, Construction<T, A>> {
     }
 }
 
-// Type aliases
 
 /// 2-dimensional commutative and associative algebra
 pub type Complex<T> = Construction<T, T>;
@@ -219,7 +243,8 @@ pub type Octonion<T> = Construction<T, Quaternion<T>>;
 /// 16-dimensional non-commutative and non-associative algebra with nontrivial zero divisors
 pub type Sedenion<T> = Construction<T, Octonion<T>>;
 
-/// Dummy test to force codecov take this file into account
+
+/// Dummy test to force codecov look at this file
 #[cfg(test)]
 #[test]
 fn dummy() {

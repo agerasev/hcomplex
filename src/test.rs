@@ -148,3 +148,35 @@ fn div2() {
     assert_approx_eq!(c.re(), 11.0/5.0);
     assert_approx_eq!(c.im(), -2.0/5.0);
 }
+
+#[test]
+fn zero2() {
+    let a = Complex::<f32>::zero();
+    assert_approx_eq!(a.re(), 0.0);
+    assert_approx_eq!(a.im(), 0.0);
+}
+
+#[test]
+fn zero4() {
+    let a = Quaternion::<f32>::zero();
+    assert_approx_eq!(a.w(), 0.0);
+    assert_approx_eq!(a.x(), 0.0);
+    assert_approx_eq!(a.y(), 0.0);
+    assert_approx_eq!(a.z(), 0.0);
+}
+
+#[test]
+fn one2() {
+    let a = Complex::<f32>::one();
+    assert_approx_eq!(a.re(), 1.0);
+    assert_approx_eq!(a.im(), 0.0);
+}
+
+#[test]
+fn one4() {
+    let a = Quaternion::<f32>::one();
+    assert_approx_eq!(a.w(), 1.0);
+    assert_approx_eq!(a.x(), 0.0);
+    assert_approx_eq!(a.y(), 0.0);
+    assert_approx_eq!(a.z(), 0.0);
+}
