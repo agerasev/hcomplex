@@ -211,24 +211,24 @@ impl<T: Float, A: Algebra<T>> Construction<T, A> {
 
 impl<T: Float, A: Algebra<T>> Construction<T, Construction<T, A>> {
     /// Create from four parts
-    fn new4(w: A, x: A, y: A, z: A) -> Self {
+    pub fn new4(w: A, x: A, y: A, z: A) -> Self {
         Self::new2(Construction::new2(w, x), Construction::new2(y, z))
     }
 
     #[inline]
-    fn w(self) -> A {
+    pub fn w(self) -> A {
         self.re().re()
     }
     #[inline]
-    fn x(self) -> A {
+    pub fn x(self) -> A {
         self.re().im()
     }
     #[inline]
-    fn y(self) -> A {
+    pub fn y(self) -> A {
         self.im().re()
     }
     #[inline]
-    fn z(self) -> A {
+    pub fn z(self) -> A {
         self.im().im()
     }
 }
