@@ -1,4 +1,5 @@
 use super::*;
+use num_traits::{Float, Zero, One};
 use assert_approx_eq::assert_approx_eq;
 
 
@@ -32,6 +33,11 @@ fn add2() {
     let c = a + b;
     assert_approx_eq!(c.re(), 4.0);
     assert_approx_eq!(c.im(), 6.0);
+
+    let mut d = a;
+    d += b;
+    assert_approx_eq!(d.re(), 4.0);
+    assert_approx_eq!(d.im(), 6.0);
 }
 
 #[test]
@@ -41,6 +47,11 @@ fn sub2() {
     let c = a - b;
     assert_approx_eq!(c.re(), -1.0);
     assert_approx_eq!(c.im(), -3.0);
+
+    let mut d = a;
+    d -= b;
+    assert_approx_eq!(d.re(), -1.0);
+    assert_approx_eq!(d.im(), -3.0);
 }
 
 #[test]
@@ -89,18 +100,28 @@ fn mul2() {
     let d = b*a;
     assert_approx_eq!(d.re(), -5.0);
     assert_approx_eq!(d.im(), 10.0);
+
+    let mut e = a;
+    e *= b;
+    assert_approx_eq!(e.re(), -5.0);
+    assert_approx_eq!(e.im(), 10.0);
 }
 
 #[test]
 fn smul2() {
     let c = Complex::<f32>::new2(1.0, 2.0);
+    let f = 2.0;
     let tf = |a: Complex<f32>| {
         assert_approx_eq!(a.re(), 2.0);
         assert_approx_eq!(a.im(), 4.0);
     };
-    tf(c*2.0);
-    tf(2.0*c);
-    tf(Complex::<f32>::new2(2.0, 0.0)*c);
+    tf(c*f);
+    tf(f*c);
+    tf(Complex::<f32>::new2(f, 0.0)*c);
+
+    let mut d = c;
+    d *= f;
+    tf(d);
 }
 
 #[test]
@@ -147,6 +168,27 @@ fn div2() {
     let c = a/b;
     assert_approx_eq!(c.re(), 11.0/5.0);
     assert_approx_eq!(c.im(), -2.0/5.0);
+
+    let mut d = a;
+    d /= b;
+    assert_approx_eq!(d.re(), 11.0/5.0);
+    assert_approx_eq!(d.im(), -2.0/5.0);
+}
+
+#[test]
+fn sdiv2() {
+    let c = Complex::<f32>::new2(1.0, 2.0);
+    let f = 2.0;
+    let tf = |a: Complex<f32>| {
+        assert_approx_eq!(a.re(), 0.5);
+        assert_approx_eq!(a.im(), 1.0);
+    };
+    tf(c/f);
+    tf(c/Complex::<f32>::new2(f, 0.0));
+
+    let mut d = c;
+    d /= f;
+    tf(d);
 }
 
 #[test]
