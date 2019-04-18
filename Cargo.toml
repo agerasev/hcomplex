@@ -1,10 +1,10 @@
 [package]
 name = "hcomplex"
-version = "0.0.1"
+version = "0.1.0"
 authors = ["Alexey Gerasev <alexey.gerasev@gmail.com>"]
 edition = "2018"
 
-description = "Lightweight complex and hcomplex algebra library"
+description = "Lightweight complex and hypercomplex algebra library"
 documentation = "https://docs.rs/hcomplex"
 homepage = "https://github.com/nthend/hcomplex"
 repository = "https://github.com/nthend/hcomplex"
