@@ -1,13 +1,13 @@
 [package]
-name = "hypercomplex"
+name = "hcomplex"
 version = "0.0.1"
 authors = ["Alexey Gerasev <alexey.gerasev@gmail.com>"]
 edition = "2018"
 
-description = "Lightweight hypercomplex algebra library"
-documentation = "https://docs.rs/hypercomplex"
-homepage = "https://github.com/nthend/hypercomplex"
-repository = "https://github.com/nthend/hypercomplex"
+description = "Lightweight complex and hcomplex algebra library"
+documentation = "https://docs.rs/hcomplex"
+homepage = "https://github.com/nthend/hcomplex"
+repository = "https://github.com/nthend/hcomplex"
 readme = "README.md"
 keywords = ["complex", "quaternion", "math"]
 categories = ["algorithms", "data-structures", "science"]
