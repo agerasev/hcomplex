@@ -1,16 +1,21 @@
 [package]
-name = "hypercomplex"
-version = "0.0.1"
+name = "hcomplex"
+version = "0.1.0"
 authors = ["Alexey Gerasev <alexey.gerasev@gmail.com>"]
 edition = "2018"
 
-description = "Lightweight hypercomplex algebra library"
-documentation = "https://docs.rs/hypercomplex"
-homepage = "https://github.com/nthend/hypercomplex"
-repository = "https://github.com/nthend/hypercomplex"
+description = "Lightweight complex and hypercomplex algebra library"
+documentation = "https://docs.rs/hcomplex"
+homepage = "https://github.com/nthend/hcomplex"
+repository = "https://github.com/nthend/hcomplex"
 readme = "README.md"
 keywords = ["complex", "quaternion", "math"]
 categories = ["algorithms", "data-structures", "science"]
 license = "MIT/Apache-2.0"
 
 [dependencies]
+num-traits = "0.2"
+num-complex = "0.2"
+
+[dev-dependencies]
+assert_approx_eq = "1.1.0"

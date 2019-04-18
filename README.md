@@ -1,4 +1,4 @@
-# hypercomplex
+# hcomplex
 
 [![Crates.io][crates_badge]][crates]
 [![Docs.rs][docs_badge]][docs]
@@ -7,26 +7,26 @@
 [![Codecov.io][codecov_badge]][codecov]
 [![License][license_badge]][license]
 
-[crates_badge]: https://img.shields.io/crates/v/hypercomplex.svg
-[docs_badge]: https://docs.rs/hypercomplex/badge.svg
-[travis_badge]: https://api.travis-ci.org/nthend/hypercomplex.svg
-[appveyor_badge]: https://ci.appveyor.com/api/projects/status/github/nthend/hypercomplex?branch=master&svg=true
-[codecov_badge]: https://codecov.io/gh/nthend/hypercomplex/graphs/badge.svg
-[license_badge]: https://img.shields.io/crates/l/hypercomplex.svg
+[crates_badge]: https://img.shields.io/crates/v/hcomplex.svg
+[docs_badge]: https://docs.rs/hcomplex/badge.svg
+[travis_badge]: https://api.travis-ci.org/nthend/hcomplex.svg
+[appveyor_badge]: https://ci.appveyor.com/api/projects/status/github/nthend/hcomplex?branch=master&svg=true
+[codecov_badge]: https://codecov.io/gh/nthend/hcomplex/graphs/badge.svg
+[license_badge]: https://img.shields.io/crates/l/hcomplex.svg
 
-[crates]: https://crates.io/crates/hypercomplex
-[docs]: https://docs.rs/hypercomplex
-[travis]: https://travis-ci.org/nthend/hypercomplex
-[appveyor]: https://ci.appveyor.com/project/nthend/hypercomplex
-[codecov]: https://codecov.io/gh/nthend/hypercomplex
+[crates]: https://crates.io/crates/hcomplex
+[docs]: https://docs.rs/hcomplex
+[travis]: https://travis-ci.org/nthend/hcomplex
+[appveyor]: https://ci.appveyor.com/project/nthend/hcomplex
+[codecov]: https://codecov.io/gh/nthend/hcomplex
 [license]: #license
 
-Lightweight hypercomplex algebra library
+Lightweight complex and hypercomplex algebra library
 
 ## Documentation
 
-+ [`crates.io` version documentation](https://docs.rs/hypercomplex)
-+ [`master` branch documentation](https://nthend.github.io/hypercomplex/target/doc/hypercomplex/index.html)
++ [`crates.io` version documentation](https://docs.rs/hcomplex)
++ [`master` branch documentation](https://nthend.github.io/hcomplex/target/doc/hcomplex/index.html)
 
 ## License
 
