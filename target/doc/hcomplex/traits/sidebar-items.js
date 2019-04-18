@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["Algebra","Some algebra over real numbers (e.g. Float, Complex, Quaternion)"],["Conj","Something that can be conjugated"],["SqrAbs","Square absolute value"]]});
