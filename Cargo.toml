@@ -1,6 +1,6 @@
 [package]
 name = "hcomplex"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Alexey Gerasev <alexey.gerasev@gmail.com>"]
 edition = "2018"
 
@@ -19,3 +19,5 @@ num-complex = "0.2"
 
 [dev-dependencies]
 assert_approx_eq = "1.1.0"
+rand = "0.6.5"
+rand_xorshift = "0.1.1"

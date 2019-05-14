@@ -28,6 +28,17 @@ Lightweight complex and hypercomplex algebra library
 + [`crates.io` version documentation](https://docs.rs/hcomplex)
 + [`master` branch documentation](https://nthend.github.io/hcomplex/target/doc/hcomplex/index.html)
 
+## Contents
+
++ Complex and hypercomplex numbers:
+  + `Complex<T>` - 2-dimensional commutative and associative algebra
+  + `Quaternion<T>` - 4-dimensional associative but non-commutative algebra
+  + `Octonion<T>` - 8-dimensional non-commutative and non-associative algebra
+  + `Sedenion<T>` - 16-dimensional non-commutative and non-associative algebra with nontrivial zero divisors
+  + and following algebras created by Cayley-Dickson construction `Construct<T, A<T>>` where `A<T>` is previous algebra
++ Transformations:
+  + `transform::Moebius<T, A<T>>` - Moebius transform, where `A<T>` is some algebra
+
 ## License
 
 Licensed under either of
