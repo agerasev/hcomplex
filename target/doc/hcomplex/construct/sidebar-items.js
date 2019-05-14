@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Construct","Cayley–Dickson construction, a basic building block"]]});
