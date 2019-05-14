@@ -13,6 +13,9 @@ pub trait Chain<T: Float, A: Algebra<T>> {
     fn chain(&self, other: &Self) -> Self;
 }
 
+pub mod prelude {
+    pub use crate::transform::{Transform, Chain};
+}
 
 #[derive(Clone, Debug)]
 pub struct Moebius<T: Float, A: Algebra<T>> {
@@ -49,13 +52,16 @@ impl<T: Float, A: Algebra<T>> Transform<T, A> for Moebius<T, A> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::{Complex, Quaternion, Octonion, Sedenion};
+    use crate::{Complex, Quaternion, Octonion};
 
     use rand::{prelude::*, Rng};
     use rand::distributions::StandardNormal;
     use rand_xorshift::XorShiftRng;
 
     use assert_approx_eq::assert_approx_eq;
+
+    const TRANSFORM_ATTEMPTS: usize = 64;
+    const POINT_ATTEMPTS: usize = 16;
 
 
     struct TestRng {
@@ -125,62 +131,51 @@ mod test {
     }
 
     #[test]
-    fn moebius2_chain() {
+    fn moebius2() {
         let mut rng = TestRng::new();
-        for _ in 0..10 {
+        for _ in 0..TRANSFORM_ATTEMPTS {
             let a = Moebius::random(&mut rng);
             let b = Moebius::random(&mut rng);
             let c = a.chain(&b);
-            for _ in 0..10 {
+            for _ in 0..POINT_ATTEMPTS {
                 let x = Complex::random(&mut rng);
                 let y = a.apply(b.apply(x));
                 let z = c.apply(x);
-                assert_approx_eq!(y.re(), z.re());
-                assert_approx_eq!(y.im(), z.im());
+                assert_approx_eq!(y, z);
             }
         }
     }
 
     #[test]
-    fn moebius4_chain() {
+    fn moebius4() {
         let mut rng = TestRng::new();
-        for _ in 0..10 {
+        for _ in 0..TRANSFORM_ATTEMPTS {
             let a = Moebius::random(&mut rng);
             let b = Moebius::random(&mut rng);
             let c = a.chain(&b);
-            for _ in 0..10 {
+            for _ in 0..POINT_ATTEMPTS {
                 let x = Quaternion::random(&mut rng);
                 let y = a.apply(b.apply(x));
                 let z = c.apply(x);
-                assert_approx_eq!(y.w(), z.w());
-                assert_approx_eq!(y.x(), z.x());
-                assert_approx_eq!(y.y(), z.y());
-                assert_approx_eq!(y.z(), z.z());
+                assert_approx_eq!(y, z);
             }
         }
     }
 
-    /// Moebuis transform over octonions isn't chainable and therefore should panic
+    /// Moebuis transform over octonions isn't chainable and therefore should fail
     #[test]
     #[should_panic]
-    fn moebius8_chain() {
+    fn moebius8() {
         let mut rng = TestRng::new();
-        for _ in 0..10 {
+        for _ in 0..TRANSFORM_ATTEMPTS {
             let a = Moebius::random(&mut rng);
             let b = Moebius::random(&mut rng);
             let c = a.chain(&b);
-            for _ in 0..10 {
+            for _ in 0..POINT_ATTEMPTS {
                 let x = Octonion::random(&mut rng);
                 let y = a.apply(b.apply(x));
                 let z = c.apply(x);
-                assert_approx_eq!(((y.0).0).0, ((z.0).0).0);
-                assert_approx_eq!(((y.0).0).1, ((z.0).0).1);
-                assert_approx_eq!(((y.0).1).0, ((z.0).1).0);
-                assert_approx_eq!(((y.0).1).1, ((z.0).1).1);
-                assert_approx_eq!(((y.1).0).0, ((z.1).0).0);
-                assert_approx_eq!(((y.1).0).1, ((z.1).0).1);
-                assert_approx_eq!(((y.1).1).0, ((z.1).1).0);
-                assert_approx_eq!(((y.1).1).1, ((z.1).1).1);
+                assert_approx_eq!(y, z);
             }
         }
     }
