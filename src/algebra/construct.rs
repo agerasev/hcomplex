@@ -5,7 +5,7 @@ use std::{
     },
     marker::PhantomData,
 };
-use num_traits::{Num, Zero, One, Inv};
+use num_traits::{Num, Zero, One, Float};
 //use std::fmt::{Display, Formatter, Result as FmtResult};
 
 use super::traits::{Conj, AbsSqr, Algebra};
@@ -14,8 +14,8 @@ use super::traits::{Conj, AbsSqr, Algebra};
 /// Cayley–Dickson construction, a basic building block.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Construct<T: Algebra, U: Algebra<T>> {
-    re: U,
-    im: U,
+    pub(super) re: U,
+    pub(super) im: U,
     phantom: PhantomData<T>,
 }
 
@@ -50,6 +50,11 @@ impl<T: Algebra, U: Algebra<T>> AbsSqr for Construct<T, U> {
     type Output = T;
     fn abs_sqr(self) -> T {
         self.re.abs_sqr() + self.im.abs_sqr()
+    }
+}
+impl<T: Float, U: Algebra<T>> Construct<T, U> {
+    pub fn abs(self) -> T {
+        self.abs_sqr().sqrt()
     }
 }
 
@@ -95,8 +100,7 @@ impl<T: Algebra, U: Algebra<T> + Copy> Mul for Construct<T, U> {
         )
     }
 }
-impl<T: Algebra + Copy, U: Algebra<T> + Copy> Inv for Construct<T, U> {
-    type Output = Self;
+impl<T: Algebra + Copy, U: Algebra<T> + Copy> Construct<T, U> {
     fn inv(self) -> Self {
         self.conj() / self.abs_sqr()
     }
@@ -202,24 +206,5 @@ impl<T: Algebra + Copy, U: Algebra<T> + Copy> MulAssign<T> for Construct<T, U> {
 impl<T: Algebra + Copy, U: Algebra<T> + Copy> DivAssign<T> for Construct<T, U> {
     fn div_assign(&mut self, other: T) -> () {
         *self = *self / other;
-    }
-}
-
-impl<T: Algebra + Copy, U: Algebra<T> + Copy> Construct<T, Construct<T, U>> {
-    /// Create from four parts.
-    pub fn new4(w: U, x: U, y: U, z: U) -> Self {
-        Self::new(Construct::new(w, x), Construct::new(y, z))
-    }
-    pub fn w(self) -> U {
-        self.re.re
-    }
-    pub fn x(self) -> U {
-        self.re.im
-    }
-    pub fn y(self) -> U {
-        self.im.re
-    }
-    pub fn z(self) -> U {
-        self.im.im
     }
 }

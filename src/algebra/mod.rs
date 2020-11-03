@@ -1,16 +1,16 @@
 mod traits;
 mod construct;
+mod quaternion;
+mod math;
 
 #[cfg(test)]
 mod approx;
-#[cfg(test)]
-pub use self::approx::*;
 
 #[cfg(test)]
 mod tests;
 
 
-//use num_complex::{Complex as NumComplex};
+use num_complex::{Complex as NumComplex};
 
 pub use traits::{Conj, AbsSqr, Algebra};
 pub use construct::{Construct};
@@ -29,15 +29,14 @@ pub type Octonion<T> = Construct<T, Quaternion<T>>;
 pub type Sedenion<T> = Construct<T, Octonion<T>>;
 
 
-/*
-impl<T> From<NumComplex<T>> for Complex<T> {
+impl<T: Algebra> From<NumComplex<T>> for Complex<T> {
     fn from(other: NumComplex<T>) -> Self {
-        Self::new2(other.re, other.im)
+        Self::new(other.re, other.im)
     }
 }
-impl<T> Into<NumComplex<T>> for Complex<T> {
-    fn from(self) -> NumComplex<T> {
-        NumComplex { re: self.0, im: self.1 }
+impl<T: Algebra> Into<NumComplex<T>> for Complex<T> {
+    fn into(self) -> NumComplex<T> {
+        let (re, im) = self.split();
+        NumComplex { re, im }
     }
 }
-*/
