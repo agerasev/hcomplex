@@ -1,4 +1,4 @@
-use std::{
+use core::{
     ops::{
         Neg, Add, Sub, Mul, Div, Rem,
         AddAssign, SubAssign, MulAssign, DivAssign, RemAssign,
@@ -6,7 +6,7 @@ use std::{
     marker::PhantomData,
 };
 use num_traits::{Num, Zero, One, Float};
-//use std::fmt::{Display, Formatter, Result as FmtResult};
+//use core::fmt::{Display, Formatter, Result as FmtResult};
 
 use super::traits::{Conj, AbsSqr, Algebra};
 

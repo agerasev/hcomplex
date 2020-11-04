@@ -13,10 +13,14 @@ keywords = ["complex", "quaternion", "math"]
 categories = ["algorithms", "data-structures", "science"]
 license = "MIT/Apache-2.0"
 
+[features]
+default = ["std"]
+std = ["num-traits/std", "num-complex/std"]
+
 [dependencies]
-num-traits = "0.2"
-num-complex = "0.2"
-vecmat = { path = "../vecmat" }
+num-traits = { version = "0.2", default-features = false, features = ["libm"] }
+num-complex = { version = "0.3", default-features = false, features = ["libm"] }
+vecmat = { path = "../vecmat", default-features = false }
 
 [dev-dependencies]
 approx = "0.4"
