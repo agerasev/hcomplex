@@ -5,7 +5,7 @@ use rand::{prelude::*, Rng};
 use rand::distributions::StandardNormal;
 use rand_xorshift::XorShiftRng;
 
-use assert_approx_eq::assert_approx_eq;
+use approx::*;
 
 const TRANSFORM_ATTEMPTS: usize = 64;
 const POINT_ATTEMPTS: usize = 16;
@@ -33,17 +33,17 @@ impl TestRand for f64 {
 }
 impl TestRand for Complex<f64> {
     fn random(rng: &mut TestRng) -> Self {
-        Self::new2(f64::random(rng), f64::random(rng))
+        Self::new(f64::random(rng), f64::random(rng))
     }
 }
 impl TestRand for Quaternion<f64> {
     fn random(rng: &mut TestRng) -> Self {
-        Self::new2(Complex::random(rng), Complex::random(rng))
+        Self::new(Complex::random(rng), Complex::random(rng))
     }
 }
 impl TestRand for Octonion<f64> {
     fn random(rng: &mut TestRng) -> Self {
-        Self::new2(Quaternion::random(rng), Quaternion::random(rng))
+        Self::new(Quaternion::random(rng), Quaternion::random(rng))
     }
 }
 impl TestRand for Moebius<f64, Complex<f64>> {
@@ -88,7 +88,7 @@ fn moebius2() {
             let x = Complex::random(&mut rng);
             let y = a.apply(b.apply(x));
             let z = c.apply(x);
-            assert_approx_eq!(y, z);
+            assert_abs_diff_eq!(y, z, epsilon=1e-12);
         }
     }
 }
@@ -97,14 +97,14 @@ fn moebius2() {
 fn moebius4() {
     let mut rng = TestRng::new();
     for _ in 0..TRANSFORM_ATTEMPTS {
-        let a = Moebius::random(&mut rng);
-        let b = Moebius::random(&mut rng);
+        let a = Moebius::<_, Quaternion<_>>::random(&mut rng);
+        let b = Moebius::<_, Quaternion<_>>::random(&mut rng);
         let c = a.chain(&b);
         for _ in 0..POINT_ATTEMPTS {
             let x = Quaternion::random(&mut rng);
             let y = a.apply(b.apply(x));
             let z = c.apply(x);
-            assert_approx_eq!(y, z);
+            assert_abs_diff_eq!(y, z, epsilon=1e-12);
         }
     }
 }
@@ -115,14 +115,14 @@ fn moebius4() {
 fn moebius8() {
     let mut rng = TestRng::new();
     for _ in 0..TRANSFORM_ATTEMPTS {
-        let a = Moebius::random(&mut rng);
-        let b = Moebius::random(&mut rng);
+        let a = Moebius::<_, Octonion<_>>::random(&mut rng);
+        let b = Moebius::<_, Octonion<_>>::random(&mut rng);
         let c = a.chain(&b);
         for _ in 0..POINT_ATTEMPTS {
             let x = Octonion::random(&mut rng);
             let y = a.apply(b.apply(x));
             let z = c.apply(x);
-            assert_approx_eq!(y, z);
+            assert_abs_diff_eq!(y, z, epsilon=1e-12);
         }
     }
 }

@@ -1,6 +1,6 @@
 mod traits;
 mod construct;
-mod quaternion;
+mod second_order;
 mod math;
 
 #[cfg(test)]

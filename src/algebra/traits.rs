@@ -1,4 +1,4 @@
-use core::ops::{Neg, Mul, Div};
+use core::ops::{Neg, Add, Sub, Mul, Div};
 use num_traits::{Num, Float};
 
 
@@ -18,6 +18,8 @@ pub trait AbsSqr {
 pub trait Algebra<T: Algebra = Self>:
     Num +
     Neg<Output=Self> +
+    Add<T, Output=Self> +
+    Sub<T, Output=Self> +
     Mul<T, Output=Self> +
     Div<T, Output=Self> +
     Conj + AbsSqr<Output=T>

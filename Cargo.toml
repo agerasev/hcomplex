@@ -16,6 +16,7 @@ license = "MIT/Apache-2.0"
 [dependencies]
 num-traits = "0.2"
 num-complex = "0.2"
+vecmat = { path = "../vecmat" }
 
 [dev-dependencies]
 approx = "0.4"

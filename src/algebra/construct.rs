@@ -77,6 +77,18 @@ impl<T: Algebra, U: Algebra<T>> Sub for Construct<T, U> {
         Self::new(self.re - other.re, self.im - other.im)
     }
 }
+impl<T: Algebra, U: Algebra<T>> Add<T> for Construct<T, U> {
+    type Output = Self;
+    fn add(self, other: T) -> Self::Output {
+        Self::new(self.re + other, self.im)
+    }
+}
+impl<T: Algebra, U: Algebra<T>> Sub<T> for Construct<T, U> {
+    type Output = Self;
+    fn sub(self, other: T) -> Self::Output {
+        Self::new(self.re - other, self.im)
+    }
+}
 
 impl<T: Algebra + Copy, U: Algebra<T>> Mul<T> for Construct<T, U> {
     type Output = Self;
@@ -90,7 +102,6 @@ impl<T: Algebra + Copy, U: Algebra<T>> Div<T> for Construct<T, U> {
         Self::new(self.re / other, self.im / other)
     }
 }
-
 impl<T: Algebra, U: Algebra<T> + Copy> Mul for Construct<T, U> {
     type Output = Self;
     fn mul(self, other: Self) -> Self::Output {
@@ -120,7 +131,6 @@ impl<T: Algebra, U: Algebra<T>> Zero for Construct<T, U> {
         self.re.is_zero() && self.im.is_zero()
     }
 }
-
 impl<T: Algebra, U: Algebra<T> + Copy> One for Construct<T, U> {
     fn one() -> Self {
         Self::new(U::one(), U::zero())
@@ -134,7 +144,6 @@ impl<T: Algebra, U: Algebra<T>> Rem for Construct<T, U> {
         unimplemented!()
     }
 }
-
 /// Not implemented yet.
 impl<T: Algebra + Copy, U: Algebra<T> + Copy> Num for Construct<T, U> {
     type FromStrRadixErr = ();
@@ -143,33 +152,50 @@ impl<T: Algebra + Copy, U: Algebra<T> + Copy> Num for Construct<T, U> {
     }
 }
 
-macro_rules! rmul {
-    ($T:ident) => (
-        /// Workaround for reverse multiplication.
-        impl<U: Algebra<$T>> Mul<Construct<$T, U>> for $T {
-            type Output = Construct<$T, U>;
-            fn mul(self, other: Construct<$T, U>) -> Self::Output {
-                other*self
-            }
+macro_rules! radd { ($T:ident) => (
+    /// Workaround for reverse addition.
+    impl<U: Algebra<$T>> Add<Construct<$T, U>> for $T {
+        type Output = Construct<$T, U>;
+        fn add(self, other: Construct<$T, U>) -> Self::Output {
+            other + self
         }
-    )
-}
-rmul!(f32);
-rmul!(f64);
-
-macro_rules! rdiv {
-    ($T:ident) => (
-        /// Workaround for reverse division.
-        impl<U: Algebra<$T> + Copy> Div<Construct<$T, U>> for $T {
-            type Output = Construct<$T, U>;
-            fn div(self, other: Construct<$T, U>) -> Self::Output {
-                other.inv()*self
-            }
+    }
+) }
+macro_rules! rsub { ($T:ident) => (
+    /// Workaround for reverse subtraction.
+    impl<U: Algebra<$T>> Sub<Construct<$T, U>> for $T {
+        type Output = Construct<$T, U>;
+        fn sub(self, other: Construct<$T, U>) -> Self::Output {
+            -other + self
         }
-    )
-}
-rdiv!(f32);
-rdiv!(f64);
+    }
+) }
+macro_rules! rmul { ($T:ident) => (
+    /// Workaround for reverse multiplication.
+    impl<U: Algebra<$T>> Mul<Construct<$T, U>> for $T {
+        type Output = Construct<$T, U>;
+        fn mul(self, other: Construct<$T, U>) -> Self::Output {
+            other*self
+        }
+    }
+) }
+macro_rules! rdiv { ($T:ident) => (
+    /// Workaround for reverse division.
+    impl<U: Algebra<$T> + Copy> Div<Construct<$T, U>> for $T {
+        type Output = Construct<$T, U>;
+        fn div(self, other: Construct<$T, U>) -> Self::Output {
+            other.inv()*self
+        }
+    }
+) }
+macro_rules! reverse { ($T:ident) => (
+    radd!($T);
+    rsub!($T);
+    rmul!($T);
+    rdiv!($T);
+) }
+reverse!(f32);
+reverse!(f64);
 
 impl<T: Algebra, U: Algebra<T>> AddAssign for Construct<T, U> where U: AddAssign {
     fn add_assign(&mut self, other: Self) -> () {
