@@ -57,6 +57,11 @@ impl<T: Float, U: Algebra<T>> Construct<T, U> {
         self.abs_sqr().sqrt()
     }
 }
+impl<T: Float, U: Algebra<T> + Copy> Construct<T, U> {
+    pub fn normalize(self) -> Self {
+        self / self.abs()
+    }
+}
 
 impl<T: Algebra, U: Algebra<T>> Neg for Construct<T, U> {
     type Output = Self;

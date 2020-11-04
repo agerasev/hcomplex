@@ -3,8 +3,11 @@ mod construct;
 mod second_order;
 mod math;
 
-#[cfg(test)]
-mod approx;
+#[cfg(feature = "random")]
+pub mod random;
+
+#[cfg(feature = "approx")]
+pub mod approx;
 
 #[cfg(test)]
 mod tests;

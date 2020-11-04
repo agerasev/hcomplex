@@ -1,34 +1,56 @@
-rtest_(constructor) {
-    comp a = c_new(0.0, 1.0);
-    assert_eq_(a.x, Approx(0.0));
-    assert_eq_(a.y, Approx(1.0));
+use rand::{prelude::*};
+use rand_distr::{Uniform};
+use rand_xorshift::XorShiftRng;
+use ::approx::*;
+use crate::{*, random::*};
+
+const SAMPLE_ATTEMPTS: usize = 64;
+
+
+#[test]
+fn constructor() {
+    let a = Complex::new(0.0, 1.0);
+    assert_abs_diff_eq!(a.re(), 0.0);
+    assert_abs_diff_eq!(a.im(), 1.0);
 }
-rtest_(inversion) {
-    for (int i = 0; i < TEST_ATTEMPTS; ++i) {
-        comp a = crng->nonzero();
-        assert_eq_(c_div(a, a), approx(C1));
+
+#[test]
+fn inversion() {
+    let mut rng = XorShiftRng::seed_from_u64(0xCAFE0);
+    for _ in 0..SAMPLE_ATTEMPTS {
+        let a: Complex<f64> = rng.sample(NonZero);
+        assert_abs_diff_eq!(a/a, Complex::new(1.0, 0.0));
     }
 }
-rtest_(square_root) {
-    for (int i = 0; i < TEST_ATTEMPTS; ++i) {
-        comp a = crng->normal();
-        comp b = c_sqrt(a);
-        assert_eq_(c_mul(b, b), approx(a));
+
+#[test]
+fn square_root() {
+    let mut rng = XorShiftRng::seed_from_u64(0xCAFE1);
+    for _ in 0..SAMPLE_ATTEMPTS {
+        let a: Complex<f64> = rng.sample(Normal);
+        let b = a.sqrt();
+        assert_abs_diff_eq!(b*b, a, epsilon=1e-12);
     }
 }
-rtest_(power) {
-    for (int i = 0; i < TEST_ATTEMPTS; ++i) {
-        comp a = crng->normal();
-        int n = int(floor(2 + 10*rng->uniform()));
-        comp b = c_pow_r(a, 1.0/n);
-        comp c = C1;
-        for (int i = 0; i < n; ++i) {
-            c = c_mul(c, b);
+
+#[test]
+fn power() {
+    let mut rng = XorShiftRng::seed_from_u64(0xCAFE1);
+    for _ in 0..SAMPLE_ATTEMPTS {
+        let a: Complex<f64> = rng.sample(Normal);
+        let n = rng.sample(Uniform::from(2..12));
+        let b = a.powf(1.0 / n as f64);
+        let mut c = Complex::new(1.0, 0.0);
+        for _ in 0..n {
+            c *= b;
         }
-        assert_eq_(c, approx(a));
+        assert_abs_diff_eq!(c, a, epsilon=1e-12);
     }
 }
-rtest_(norm) {
-    assert_eq_(c_norm_l1(c_new(-1, 2)), approx(3));
-    assert_eq_(length(c_new(3, -4)), approx(5));
+
+#[test]
+fn norm() {
+    // TODO: Implement L1 norm.
+    //assert_abs_diff_eq!(Complex::new(-1, 2).l1_norm(), 3.0);
+    assert_abs_diff_eq!(Complex::new(3.0, -4.0).abs(), 5.0);
 }

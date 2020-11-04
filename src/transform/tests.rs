@@ -2,7 +2,7 @@ use super::*;
 use crate::{Complex, Quaternion, Octonion};
 
 use rand::{prelude::*, Rng};
-use rand::distributions::StandardNormal;
+use rand_distr::StandardNormal;
 use rand_xorshift::XorShiftRng;
 
 use approx::*;

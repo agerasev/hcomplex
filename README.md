@@ -21,12 +21,7 @@
 [codecov]: https://codecov.io/gh/nthend/hcomplex
 [license]: #license
 
-Lightweight complex and hypercomplex algebra library
-
-## Documentation
-
-+ [`crates.io` version documentation](https://docs.rs/hcomplex)
-+ [`master` branch documentation](https://nthend.github.io/hcomplex/target/doc/hcomplex/index.html)
+Lightweight complex and hypercomplex algebra library.
 
 ## Contents
 
@@ -38,6 +33,20 @@ Lightweight complex and hypercomplex algebra library
   + and following algebras created by Cayley-Dickson construction `Construct<T, A<T>>` where `A<T>` is previous algebra
 + Transformations:
   + `transform::Moebius<T, A<T>>` - Moebius transform, where `A<T>` is some algebra
+
+## Crate Features
+
+Crate could be used in `no_std` mode.
+
++ `std` - Use `std`. Enabled by default.
++ `random` - Hypercomplex number random generator.
++ `approx` - Approximate comparison of hypercomplex numbers.
+
+## Testing
+
+```bash
+cargo test --features random,approx
+```
 
 ## License
 

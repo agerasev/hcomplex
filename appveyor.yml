@@ -46,4 +46,5 @@ install:
 build: false
 
 test_script:
-- cargo test --verbose %cargoflags%
+- cargo test --verbose --features random,approx %cargoflags%
+- cargo test --verbose --no-default-features --features random,approx %cargoflags%
