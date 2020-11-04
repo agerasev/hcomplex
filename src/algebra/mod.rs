@@ -15,7 +15,7 @@ mod tests;
 
 use num_complex::{Complex as NumComplex};
 
-pub use traits::{Conj, AbsSqr, Algebra};
+pub use traits::{Conj, NormSqr, Norm, L1Norm, Algebra};
 pub use construct::{Construct};
 
 

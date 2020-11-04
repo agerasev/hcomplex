@@ -9,6 +9,6 @@ pub use algebra::*;
 pub mod transform;
 
 pub mod prelude {
-    pub use num_traits::{One, Zero};
-    pub use crate::{Conj, AbsSqr, Algebra};
+    pub use num_traits::{One, Zero, Inv};
+    pub use crate::{Conj, NormSqr, Norm, L1Norm, Algebra};
 }
