@@ -1,12 +1,11 @@
 use core::{
     ops::{
-        Neg, Add, Sub, Mul, Div,
+        Neg, Add, Sub, Mul, Div, Rem,
         AddAssign, SubAssign, MulAssign, DivAssign,
     },
     marker::PhantomData,
 };
-use num_traits::{Zero, One, Float, Inv};
-//use core::fmt::{Display, Formatter, Result as FmtResult};
+use num_traits::{Zero, One, Float, Inv, Num};
 
 use super::traits::{Conj, NormSqr, Norm, L1Norm, Algebra};
 
@@ -16,7 +15,7 @@ use super::traits::{Conj, NormSqr, Norm, L1Norm, Algebra};
 /// Structure takes two type parameters:
 /// + The first one, `T`: a scalar type the algebra is built over.
 /// + The second one, `U`: is a type of two components of the construction: `re` and `im`.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct Construct<T, U> {
     re: U,
     im: U,
@@ -146,7 +145,6 @@ impl<T, U> Div for Construct<T, U> where Self: Inv<Output=Self> + Mul<Output=Sel
     }
 }
 
-
 impl<T, U> Zero for Construct<T, U> where U: Zero {
     fn zero() -> Self {
         Self::new(U::zero(), U::zero())
@@ -161,17 +159,32 @@ impl<T, U> One for Construct<T, U> where U: Zero + One, Self: Mul<Output=Self> {
     }
 }
 
-impl<T, U> Algebra<T> for Construct<T, U> where T: Algebra + Clone, U: Algebra<T> + Clone {}
-
 impl<T, U> Construct<T, U> where Self: Clone + Norm<Output=T> + Div<T, Output=Self> {
     pub fn normalize(self) -> Self {
         self.clone() / self.norm()
     }
 }
 
+/// Not implemented yet.
+impl<T: Num + Algebra + Clone, U: Num + Algebra<T> + Clone> Rem for Construct<T, U> {
+    type Output = Self;
+    fn rem(self, _other: Self) -> Self::Output {
+        unimplemented!()
+    }
+}
+/// Not implemented yet.
+impl<T: Num + Algebra + Clone, U: Num + Algebra<T> + Clone> Num for Construct<T, U> {
+    type FromStrRadixErr = ();
+    fn from_str_radix(_str: &str, _radix: u32) -> Result<Self, Self::FromStrRadixErr> {
+        unimplemented!()
+    }
+}
+
+impl<T, U> Algebra<T> for Construct<T, U> where T: Algebra + Clone, U: Algebra<T> + Clone {}
+
 macro_rules! radd { ($T:ident) => (
     /// Workaround for reverse addition.
-    impl<U: Algebra<$T>> Add<Construct<$T, U>> for $T {
+    impl<U> Add<Construct<$T, U>> for $T where Construct<$T, U>: Add<$T, Output=Construct<$T, U>> {
         type Output = Construct<$T, U>;
         fn add(self, other: Construct<$T, U>) -> Self::Output {
             other + self
@@ -180,7 +193,7 @@ macro_rules! radd { ($T:ident) => (
 ) }
 macro_rules! rsub { ($T:ident) => (
     /// Workaround for reverse subtraction.
-    impl<U: Algebra<$T>> Sub<Construct<$T, U>> for $T {
+    impl<U> Sub<Construct<$T, U>> for $T where Construct<$T, U>: Neg<Output=Construct<$T, U>> + Add<$T, Output=Construct<$T, U>> {
         type Output = Construct<$T, U>;
         fn sub(self, other: Construct<$T, U>) -> Self::Output {
             -other + self
@@ -189,7 +202,7 @@ macro_rules! rsub { ($T:ident) => (
 ) }
 macro_rules! rmul { ($T:ident) => (
     /// Workaround for reverse multiplication.
-    impl<U: Algebra<$T>> Mul<Construct<$T, U>> for $T {
+    impl<U> Mul<Construct<$T, U>> for $T where Construct<$T, U>: Mul<$T, Output=Construct<$T, U>> {
         type Output = Construct<$T, U>;
         fn mul(self, other: Construct<$T, U>) -> Self::Output {
             other*self
@@ -198,7 +211,7 @@ macro_rules! rmul { ($T:ident) => (
 ) }
 macro_rules! rdiv { ($T:ident) => (
     /// Workaround for reverse division.
-    impl<U: Algebra<$T> + Copy> Div<Construct<$T, U>> for $T {
+    impl<U> Div<Construct<$T, U>> for $T where Construct<$T, U>: Inv<Output=Construct<$T, U>> + Mul<$T, Output=Construct<$T, U>> + Clone {
         type Output = Construct<$T, U>;
         fn div(self, other: Construct<$T, U>) -> Self::Output {
             other.inv()*self
@@ -214,35 +227,46 @@ macro_rules! reverse { ($T:ident) => (
 reverse!(f32);
 reverse!(f64);
 
-impl<T: Algebra, U: Algebra<T>> AddAssign for Construct<T, U> where U: AddAssign {
+
+impl<T, U> AddAssign for Construct<T, U> where U: AddAssign {
     fn add_assign(&mut self, other: Self) -> () {
         self.re += other.re;
         self.im += other.im;
     }
 }
-impl<T: Algebra, U: Algebra<T>> SubAssign for Construct<T, U> where U: SubAssign {
+impl<T, U> SubAssign for Construct<T, U> where U: SubAssign {
     fn sub_assign(&mut self, other: Self) -> () {
         self.re -= other.re;
         self.im -= other.im;
     }
 }
-impl<T: Algebra + Copy, U: Algebra<T> + Copy> MulAssign for Construct<T, U> {
-    fn mul_assign(&mut self, other: Self) -> () {
-        *self = *self * other;
+impl<T, U> AddAssign<T> for Construct<T, U> where U: AddAssign<T> {
+    fn add_assign(&mut self, other: T) -> () {
+        self.re += other;
     }
 }
-impl<T: Algebra + Copy, U: Algebra<T> + Copy> DivAssign for Construct<T, U> {
-    fn div_assign(&mut self, other: Self) -> () {
-        *self = *self / other;
+impl<T, U> SubAssign<T> for Construct<T, U> where U: SubAssign<T> {
+    fn sub_assign(&mut self, other: T) -> () {
+        self.re -= other;
     }
 }
-impl<T: Algebra + Copy, U: Algebra<T> + Copy> MulAssign<T> for Construct<T, U> {
+impl<T, U> MulAssign<T> for Construct<T, U> where Self: Clone + Mul<T, Output=Self> {
     fn mul_assign(&mut self, other: T) -> () {
-        *self = *self * other;
+        *self = self.clone() * other;
     }
 }
-impl<T: Algebra + Copy, U: Algebra<T> + Copy> DivAssign<T> for Construct<T, U> {
+impl<T, U> DivAssign<T> for Construct<T, U> where Self: Clone + Div<T, Output=Self> {
     fn div_assign(&mut self, other: T) -> () {
-        *self = *self / other;
+        *self = self.clone() / other;
+    }
+}
+impl<T, U> MulAssign for Construct<T, U> where Self: Clone + Mul<Output=Self> {
+    fn mul_assign(&mut self, other: Self) -> () {
+        *self = self.clone() * other;
+    }
+}
+impl<T, U> DivAssign for Construct<T, U> where Self: Clone + Div<Output=Self> {
+    fn div_assign(&mut self, other: Self) -> () {
+        *self = self.clone() / other;
     }
 }

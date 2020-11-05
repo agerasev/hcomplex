@@ -3,6 +3,9 @@ mod construct;
 mod second_order;
 mod math;
 
+#[cfg(feature = "std")]
+pub mod format;
+
 #[cfg(feature = "random")]
 pub mod random;
 
@@ -32,12 +35,12 @@ pub type Octonion<T> = Construct<T, Quaternion<T>>;
 pub type Sedenion<T> = Construct<T, Octonion<T>>;
 
 
-impl<T: Algebra> From<NumComplex<T>> for Complex<T> {
+impl<T> From<NumComplex<T>> for Complex<T> {
     fn from(other: NumComplex<T>) -> Self {
         Self::new(other.re, other.im)
     }
 }
-impl<T: Algebra> Into<NumComplex<T>> for Complex<T> {
+impl<T> Into<NumComplex<T>> for Complex<T> {
     fn into(self) -> NumComplex<T> {
         let (re, im) = self.split();
         NumComplex { re, im }

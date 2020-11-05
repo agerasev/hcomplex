@@ -5,11 +5,8 @@ pub use moebius::*;
 mod tests;
 
 
-use crate::{Algebra};
-
-
 /// Complex and hypercomplex transformation basic trait.
-pub trait Transform<T: Algebra, U: Algebra<T>> {
+pub trait Transform<U> {
     /// Apply the transformation.
     fn apply(&self, x: U) -> U;
 }
@@ -21,19 +18,19 @@ pub trait Identity {
 }
 
 /// Differentiable transformation.
-pub trait Deriv<T: Algebra, U: Algebra<T>>: Transform<T, U> {
+pub trait Deriv<U>: Transform<U> {
     /// Find the derivative of `self` at the specified point `p`.
     fn deriv(&self, p: U) -> U;
 }
 /// Directionally differentiable transformation.
-pub trait DerivDir<T: Algebra, U: Algebra<T>>: Transform<T, U> {
+pub trait DerivDir<U>: Transform<U> {
     /// Find the directinal derivative of `self` at the specified point `p` via the specified direction `d`.
     fn deriv_dir(&self, p: U, d: U) -> U;
 }
 
 /// Transformation which instances could be chained into another one (i.e. forms a magma).
-pub trait Chain<T: Algebra, U: Algebra<T>>: Transform<T, U> {
-    fn chain(&self, other: &Self) -> Self;
+pub trait Chain<U>: Transform<U> {
+    fn chain(self, other: Self) -> Self;
 }
 
 

@@ -46,7 +46,7 @@ impl TestRand for Octonion<f64> {
         Self::new(Quaternion::random(rng), Quaternion::random(rng))
     }
 }
-impl TestRand for Moebius<f64, Complex<f64>> {
+impl TestRand for Moebius<Complex<f64>> {
     fn random(rng: &mut TestRng) -> Self {
         Self::new(
             Complex::random(rng),
@@ -56,7 +56,7 @@ impl TestRand for Moebius<f64, Complex<f64>> {
         )
     }
 }
-impl TestRand for Moebius<f64, Quaternion<f64>> {
+impl TestRand for Moebius<Quaternion<f64>> {
     fn random(rng: &mut TestRng) -> Self {
         Self::new(
             Quaternion::random(rng),
@@ -66,7 +66,7 @@ impl TestRand for Moebius<f64, Quaternion<f64>> {
         )
     }
 }
-impl TestRand for Moebius<f64, Octonion<f64>> {
+impl TestRand for Moebius<Octonion<f64>> {
     fn random(rng: &mut TestRng) -> Self {
         Self::new(
             Octonion::random(rng),
@@ -83,7 +83,7 @@ fn moebius2() {
     for _ in 0..TRANSFORM_ATTEMPTS {
         let a = Moebius::random(&mut rng);
         let b = Moebius::random(&mut rng);
-        let c = a.chain(&b);
+        let c = a.chain(b);
         for _ in 0..POINT_ATTEMPTS {
             let x = Complex::random(&mut rng);
             let y = a.apply(b.apply(x));
@@ -97,9 +97,9 @@ fn moebius2() {
 fn moebius4() {
     let mut rng = TestRng::new();
     for _ in 0..TRANSFORM_ATTEMPTS {
-        let a = Moebius::<_, Quaternion<_>>::random(&mut rng);
-        let b = Moebius::<_, Quaternion<_>>::random(&mut rng);
-        let c = a.chain(&b);
+        let a = Moebius::<Quaternion<_>>::random(&mut rng);
+        let b = Moebius::<Quaternion<_>>::random(&mut rng);
+        let c = a.chain(b);
         for _ in 0..POINT_ATTEMPTS {
             let x = Quaternion::random(&mut rng);
             let y = a.apply(b.apply(x));
@@ -115,9 +115,9 @@ fn moebius4() {
 fn moebius8() {
     let mut rng = TestRng::new();
     for _ in 0..TRANSFORM_ATTEMPTS {
-        let a = Moebius::<_, Octonion<_>>::random(&mut rng);
-        let b = Moebius::<_, Octonion<_>>::random(&mut rng);
-        let c = a.chain(&b);
+        let a = Moebius::<Octonion<_>>::random(&mut rng);
+        let b = Moebius::<Octonion<_>>::random(&mut rng);
+        let c = a.chain(b);
         for _ in 0..POINT_ATTEMPTS {
             let x = Octonion::random(&mut rng);
             let y = a.apply(b.apply(x));

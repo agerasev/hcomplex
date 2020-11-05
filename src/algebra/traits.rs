@@ -1,4 +1,6 @@
-use core::ops::{Neg, Add, Sub, Mul, Div};
+use core::ops::{
+    Neg, Add, Sub, Mul, Div,
+};
 use num_traits::{Zero, One, Float};
 
 
