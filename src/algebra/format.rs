@@ -1,23 +1,23 @@
-use std::{
-    vec::Vec,
-    string::String,
-    fmt::{Debug, Display, Formatter, Result as FmtResult},
-    format, vec,
-};
+use core::fmt::{Debug, Display, Formatter, Result as FmtResult};
 use super::construct::*;
 
+pub enum FmtType {
+    Debug,
+    Display
+}
 
 pub trait Format<T> {
     fn level() -> usize;
-    fn content(&self) -> Vec<&T>;
-    fn name() -> String {
+    fn write_content_debug(&self, f: &mut Formatter) -> FmtResult where T: Debug;
+    fn write_content_display(&self, f: &mut Formatter) -> FmtResult where T: Display;
+    fn write_name(f: &mut Formatter) -> FmtResult {
         match Self::level() {
             0 => unreachable!(),
-            1 => "Complex".into(),
-            2 => "Quaternion".into(),
-            3 => "Octonion".into(),
-            4 => "Sedenion".into(),
-            n @ _ => format!("Construct{}", n),
+            1 => write!(f, "Complex"),
+            2 => write!(f, "Quaternion"),
+            3 => write!(f, "Octonion"),
+            4 => write!(f, "Sedenion"),
+            n @ _ => write!(f, "Construct{}", n),
         }
     }
 }
@@ -26,37 +26,47 @@ impl<T, U> Format<T> for Construct<T, Construct<T, U>> where Construct<T, U>: Fo
     fn level() -> usize {
         Construct::<T, U>::level() + 1
     }
-    fn content(&self) -> Vec<&T> {
-        let mut v = self.re_ref().content();
-        v.append(&mut self.im_ref().content());
-        v
+    fn write_content_debug(&self, f: &mut Formatter) -> FmtResult where T: Debug {
+        self.re_ref().write_content_debug(f)?;
+        write!(f, ", ")?;
+        self.im_ref().write_content_debug(f)
+    }
+    fn write_content_display(&self, f: &mut Formatter) -> FmtResult where T: Display {
+        self.re_ref().write_content_display(f)?;
+        write!(f, ", ")?;
+        self.im_ref().write_content_display(f)
     }
 }
 impl<T> Format<T> for Construct<T, T> {
     fn level() -> usize {
         1
     }
-    fn content(&self) -> Vec<&T> {
-        vec!(self.re_ref(), self.im_ref())
+    fn write_content_debug(&self, f: &mut Formatter) -> FmtResult where T: Debug {
+        write!(f, "{:?}, {:?}", self.re_ref(), self.im_ref())
+    }
+    fn write_content_display(&self, f: &mut Formatter) -> FmtResult where T: Display {
+        write!(f, "{}, {}", self.re_ref(), self.im_ref())
     }
 }
 
 impl<T: Debug, U> Debug for Construct<T, U> where Self: Format<T> {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        write!(f, "{}({})", Self::name(),
-            self.content().into_iter().map(|x| format!("{:?}", x)).collect::<Vec<_>>().join(", ")
-        )
+        Self::write_name(f)?;
+        write!(f, "(")?;
+        self.write_content_debug(f)?;
+        write!(f, ")")
     }
 }
 impl<T: Display, U> Display for Construct<T, U> where Self: Format<T> {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        write!(f, "{}({})", Self::name(),
-            self.content().into_iter().map(|x| format!("{}", x)).collect::<Vec<_>>().join(", ")
-        )
+        Self::write_name(f)?;
+        write!(f, "(")?;
+        self.write_content_display(f)?;
+        write!(f, ")")
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "std"))]
 mod tests {
     use std::format;
     use crate::algebra::*;

@@ -2,8 +2,6 @@ mod traits;
 mod construct;
 mod second_order;
 mod math;
-
-#[cfg(feature = "std")]
 pub mod format;
 
 #[cfg(feature = "random")]
