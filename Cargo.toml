@@ -27,7 +27,7 @@ approx = { version = "0.4", optional = true }
 rand_xorshift = "0.2"
 
 [features]
-default = ["std", "vecmat"]
+default = ["std", "vecmat", "random", "approx"]
 std = ["num-traits/std", "num-complex/std", "vecmat/std"]
 random = ["rand", "rand_distr"]
 

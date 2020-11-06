@@ -1,8 +1,7 @@
-use core::ops::{Add, Mul, Div};
-use num_traits::{Zero, One};
+use core::ops::{Neg, Add, Mul, Div};
+use num_traits::{Zero, One, Num};
 use vecmat::matrix::{Matrix2x2, Dot};
-use super::*;
-use crate::{Construct, Algebra};
+use crate::{Construct, Algebra, transform::*};
 
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -74,5 +73,15 @@ impl<U> Transform<U> for Moebius<U> where U: Add<Output=U> + Mul<Output=U> + Div
 impl<T: Algebra + Clone, U: Algebra<T> + Clone> Transform<Construct<T, Construct<T, U>>> for Moebius<Construct<T, U>> {
     fn apply(&self, x: Construct<T, Construct<T, U>>) -> Construct<T, Construct<T, U>> {
         (self.a()*x.clone() + self.b())/(self.c()*x + self.d())
+    }
+}
+
+impl<U: Neg<Output=U> + Num + Clone> Moebius<U> {
+    pub fn det(&self) -> U {
+        self.data.det()
+    }
+    pub fn normalize(self) -> Self {
+        let det = self.det();
+        (self.data / det).into()
     }
 }

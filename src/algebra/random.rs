@@ -1,44 +1,38 @@
 use core::ops::{Div};
-use num_traits::{Float};
-use rand::{Rng};
-use rand_distr::{Distribution, StandardNormal};
+use num_traits::Float;
+use rand::Rng;
+use rand_distr::Distribution;
 use super::*;
 
 
-pub trait Random<T> where StandardNormal: Distribution<T> {
-    fn sample_snd<R: Rng + ?Sized>(rng: &mut R, snd: &StandardNormal) -> Self;
-}
-impl<T> Random<T> for T where StandardNormal: Distribution<T> {
-    fn sample_snd<R: Rng + ?Sized>(rng: &mut R, snd: &StandardNormal) -> Self {
-        rng.sample(snd)
-    }
-}
-impl<T, U: Random<T>> Random<T> for Construct<T, U> where StandardNormal: Distribution<T> {
-    fn sample_snd<R: Rng + ?Sized>(rng: &mut R, snd: &StandardNormal) -> Self {
-        Construct::new(U::sample_snd(rng, snd), U::sample_snd(rng, snd))
-    }
-}
+pub use rand_distr::StandardNormal;
 
-pub struct Normal;
+/// Distribution that only guarantees to produce an element which norm is greater than epsilon.
 pub struct NonZero;
+
+/// Distribution that provides points uniformly distubuted on the N-dimensional sphere,
+/// where N is the number of dimensions of a specified hypercomplex number.
 pub struct Unit;
 
-impl<T, U: Random<T>> Distribution<Construct<T, U>> for Normal where StandardNormal: Distribution<T> {
+
+impl<T, U> Distribution<Construct<T, U>> for StandardNormal where StandardNormal: Distribution<U> {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Construct<T, U> {
-        Construct::sample_snd(rng, &StandardNormal)
+        Construct::new(rng.sample(Self), rng.sample(Self))
     }
 }
-impl<T: Float, U: Random<T> + NormSqr<Output=T> + Clone> Distribution<Construct<T, U>> for NonZero where StandardNormal: Distribution<T> {
+
+impl<T: Float, U: NormSqr<Output=T> + Clone> Distribution<Construct<T, U>> for NonZero where StandardNormal: Distribution<Construct<T, U>> {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Construct<T, U> {
         loop {
-            let x = rng.sample(&Normal);
+            let x = rng.sample(&StandardNormal);
             if x.clone().norm() > T::epsilon() {
                 break x;
             }
         }
     }
 }
-impl<T: Float, U: Random<T> + NormSqr<Output=T> + Div<T, Output=U> + Clone> Distribution<Construct<T, U>> for Unit where StandardNormal: Distribution<T> {
+
+impl<T: Float, U: NormSqr<Output=T> + Div<T, Output=U> + Clone> Distribution<Construct<T, U>> for Unit where NonZero: Distribution<Construct<T, U>> {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Construct<T, U> {
         rng.sample(&NonZero).normalize()
     }

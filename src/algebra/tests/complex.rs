@@ -27,7 +27,7 @@ fn inversion() {
 fn square_root() {
     let mut rng = XorShiftRng::seed_from_u64(0xCAFE1);
     for _ in 0..SAMPLE_ATTEMPTS {
-        let a: Complex<f64> = rng.sample(Normal);
+        let a: Complex<f64> = rng.sample(StandardNormal);
         let b = a.sqrt();
         assert_abs_diff_eq!(b*b, a, epsilon=1e-12);
     }
@@ -37,7 +37,7 @@ fn square_root() {
 fn power() {
     let mut rng = XorShiftRng::seed_from_u64(0xCAFE1);
     for _ in 0..SAMPLE_ATTEMPTS {
-        let a: Complex<f64> = rng.sample(Normal);
+        let a: Complex<f64> = rng.sample(StandardNormal);
         let n = rng.sample(Uniform::from(2..12));
         let b = a.powf(1.0 / n as f64);
         let mut c = Complex::new(1.0, 0.0);
