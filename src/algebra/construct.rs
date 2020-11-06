@@ -6,8 +6,9 @@ use core::{
     marker::PhantomData,
 };
 use num_traits::{Zero, One, Float, Inv, Num};
+use super::traits::{Conj, NormSqr, Norm, NormL1, Algebra};
 
-use super::traits::{Conj, NormSqr, Norm, L1Norm, Algebra};
+
 
 
 /// Cayley–Dickson construction, a basic building block.
@@ -72,10 +73,10 @@ impl<T, U> Norm for Construct<T, U> where T: Float, Self: NormSqr<Output=T> {
         self.norm_sqr().sqrt()
     }
 }
-impl<T, U> L1Norm for Construct<T, U> where T: Add<Output=T>, U: L1Norm<Output=T> {
+impl<T, U> NormL1 for Construct<T, U> where T: Add<Output=T>, U: NormL1<Output=T> {
     type Output = T;
-    fn l1_norm(self) -> T {
-        self.re.l1_norm() + self.im.l1_norm()
+    fn norm_l1(self) -> T {
+        self.re.norm_l1() + self.im.norm_l1()
     }
 }
 

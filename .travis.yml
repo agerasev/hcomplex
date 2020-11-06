@@ -13,7 +13,7 @@ matrix:
 
 script:
   - cargo test --verbose --features random,approx
-  - cargo test --verbose --no-default-features --features random,approx
+  - cargo test --verbose --no-default-features --features vecmat,random,approx
 
 #addons:
 #  apt:

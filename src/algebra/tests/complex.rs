@@ -4,7 +4,7 @@ use rand_xorshift::XorShiftRng;
 use ::approx::*;
 use crate::{*, random::*};
 
-const SAMPLE_ATTEMPTS: usize = 64;
+const SAMPLE_ATTEMPTS: usize = 256;
 
 
 #[test]

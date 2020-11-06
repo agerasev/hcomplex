@@ -108,10 +108,10 @@ impl<T: Float> Complex<T> {
         self.into_num().finv().into()
     }
 }
-impl<T: Float + Clone> Complex<T> {
+impl<T: Float + Clone> Complex<T> where Self: Norm<Output=T> {
     /// Convert to polar form.
     pub fn to_polar(self) -> (T, T) {
-        (self.abs(), self.arg())
+        (self.norm(), self.arg())
     }
     /// Convert a polar representation into a complex number.
     pub fn from_polar(r: T, theta: T) -> Self {

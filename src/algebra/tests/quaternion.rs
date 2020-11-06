@@ -1,73 +1,100 @@
-static_thread_local_(TestRng<quat>, qrng) {
-    return TestRng<quat>(0xfeed);
+use rand::{prelude::*};
+use rand_xorshift::XorShiftRng;
+use ::approx::*;
+use crate::{prelude::*, *, random::*};
+
+#[cfg(feature = "vecmat")]
+use vecmat::Dot;
+
+#[cfg(feature = "std")]
+use std::{boxed::Box};
+
+
+const SAMPLE_ATTEMPTS: usize = 256;
+type Qf = Quaternion<f64>;
+
+
+#[test]
+fn imaginary_units() {
+    type Qi = Quaternion<i32>;
+    assert_eq!(Qi::i()*Qi::i(), -Qi::one());
+    assert_eq!(Qi::j()*Qi::j(), -Qi::one());
+    assert_eq!(Qi::k()*Qi::k(), -Qi::one());
+    assert_eq!(Qi::i()*Qi::j()*Qi::k(), -Qi::one());
+
+    assert_eq!(Qi::i()*Qi::j(), Qi::k());
+    assert_eq!(Qi::j()*Qi::k(), Qi::i());
+    assert_eq!(Qi::k()*Qi::i(), Qi::j());
+
+    assert_eq!(Qi::j()*Qi::i(), -Qi::k());
+    assert_eq!(Qi::k()*Qi::j(), -Qi::i());
+    assert_eq!(Qi::i()*Qi::k(), -Qi::j());
 }
 
-rtest_(imaginary_units) {
-    assert_eq_(q_mul(QI, QI), approx(-Q1));
-    assert_eq_(q_mul(QJ, QJ), approx(-Q1));
-    assert_eq_(q_mul(QK, QK), approx(-Q1));
-    assert_eq_(q_mul(q_mul(QI, QJ), QK), approx(-Q1));
+#[test]
+fn inversion() {
+    let mut rng = XorShiftRng::seed_from_u64(0xFEED0);
+    for _ in 0..SAMPLE_ATTEMPTS {
+        let a: Qf = rng.sample(&NonZero);
+        assert_abs_diff_eq!(a/a, Quaternion::one(), epsilon=1e-14);
+    }
+}
 
-    assert_eq_(q_mul(QI, QJ), approx(QK));
-    assert_eq_(q_mul(QJ, QK), approx(QI));
-    assert_eq_(q_mul(QK, QI), approx(QJ));
+#[cfg(feature = "vecmat")]
+#[test]
+fn law_of_cosines() {
+    for _ in 0..SAMPLE_ATTEMPTS {
+        let mut rng = XorShiftRng::seed_from_u64(0xFEED1);
+        let a: Qf = rng.sample(&Normal);
+        let b: Qf = rng.sample(&Normal);
+        assert_abs_diff_eq!(a.norm_sqr() + b.norm_sqr() + 2.0*a.dot(b), (a + b).norm_sqr());
+    }
+}
 
-    assert_eq_(q_mul(QJ, QI), approx(-QK));
-    assert_eq_(q_mul(QK, QJ), approx(-QI));
-    assert_eq_(q_mul(QI, QK), approx(-QJ));
-}
-rtest_(inversion) {
-    for (int i = 0; i < TEST_ATTEMPTS; ++i) {
-        quat a = qrng->nonzero();
-        assert_eq_(q_div(a, a), approx(Q1));
+#[test]
+fn conjugation() {
+    for _ in 0..SAMPLE_ATTEMPTS {
+        let mut rng = XorShiftRng::seed_from_u64(0xFEED2);
+        let a: Qf = rng.sample(&Normal);
+        assert_abs_diff_eq!(a*a.conj(), Quaternion::<f64>::one()*a.norm_sqr());
+        assert_abs_diff_eq!(a.conj()*a, Quaternion::<f64>::one()*a.norm_sqr());
     }
 }
-rtest_(law_of_cosines) {
-    for (int i = 0; i < TEST_ATTEMPTS; ++i) {
-        quat a = qrng->normal(), b = qrng->normal();
-        assert_eq_(q_abs2(a) + q_abs2(b) + 2*dot(a, b), Approx(q_abs2(a + b)));
-    }
-}
-rtest_(conjugation) {
-    for (int i = 0; i < TEST_ATTEMPTS; ++i) {
-        quat a = qrng->normal();
-        assert_eq_(q_mul(a, q_conj(a)), approx(q_abs2(a)*Q1));
-        assert_eq_(q_mul(q_conj(a), a), approx(q_abs2(a)*Q1));
-    }
-}
-rtest_(derivation) {
-    std::vector<std::pair<
-        std::function<quat(quat)>,
-        std::function<quat(quat, quat)>
-    >> cases = {
-        std::make_pair(
-            [](quat p) { return p; },
-            [](quat, quat v) { return v; }
+
+#[cfg(feature = "std")]
+#[test]
+fn derivation() {
+    let cases = [
+        (
+            Box::new(|p: Qf| p) as Box<dyn Fn(_) -> _>,
+            Box::new(|_: Qf, v: Qf| v) as Box<dyn Fn(_, _) -> _>,
         ),
-        std::make_pair(
-            [](quat p) { return q_mul(p, p); },
-            [](quat p, quat v) { return q_mul(p, v) + q_mul(v, p); }
+        (
+            Box::new(|p: Qf| p*p),
+            Box::new(|p: Qf, v: Qf| p*v + v*p),
         ),
-        std::make_pair(
-            [](quat p) { return q_inverse(p); },
-            [](quat p, quat v) {
-                real p2 = q_abs2(p);
-                return (q_conj(v) - (2*dot(p, v)/p2)*q_conj(p))/p2;
-            }
-        )
-    };
+        (
+            Box::new(|p: Qf| p.inv()),
+            Box::new(|p: Qf, v: Qf| {
+                let p2 = p.norm_sqr();
+                (v.conj() - (2.0*p.dot(v)/p2)*p.conj())/p2
+            })
+        ),
+    ];
 
-    for (auto p : cases) {
-        auto f = p.first;
-        auto dfdv = p.second;
-        for (int i = 0; i < TEST_ATTEMPTS; ++i) {
-            quat p = qrng->normal();
-            quat v = qrng->unit();
-            quat deriv = dfdv(p, v);
-            real dabs = q_abs(deriv);
-            assert_eq_(
-                approx(deriv).epsilon(1e3*EPS*dabs),
-                (f(p + EPS*v) - f(p))/EPS
+    const EPS: f64 = 1e-8;
+    let mut rng = XorShiftRng::seed_from_u64(0xFEED3);
+
+    for (f, dfdv) in cases.iter() {
+        for _ in 0..SAMPLE_ATTEMPTS {
+            let p = rng.sample(&Normal);
+            let v = rng.sample(&Unit);
+            let deriv = dfdv(p, v);
+            let dabs = deriv.norm();
+            assert_abs_diff_eq!(
+                deriv,
+                (f(p + EPS*v) - f(p))/EPS,
+                epsilon=1e-6*dabs,
             );
         }
     }

@@ -2,7 +2,11 @@ mod traits;
 mod construct;
 mod second_order;
 mod math;
+mod specific;
 pub mod format;
+
+#[cfg(feature = "vecmat")]
+pub mod vector;
 
 #[cfg(feature = "random")]
 pub mod random;
@@ -16,7 +20,7 @@ mod tests;
 
 use num_complex::{Complex as NumComplex};
 
-pub use traits::{Conj, NormSqr, Norm, L1Norm, Algebra};
+pub use traits::{Conj, NormSqr, Norm, NormL1, Algebra};
 pub use construct::{Construct};
 
 

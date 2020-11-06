@@ -1,7 +1,7 @@
 use core::ops::{
     Neg, Add, Sub, Mul, Div,
 };
-use num_traits::{Zero, One, Float};
+use num_traits::{Zero, One};
 
 
 /// Something that can be conjugated.
@@ -33,10 +33,10 @@ pub trait Norm: Sized {
 }
 
 /// L1 (Manhattan) Norm.
-pub trait L1Norm {
+pub trait NormL1 {
     type Output;
     /// Get the L1 norm of the `self`.
-    fn l1_norm(self) -> Self::Output;
+    fn norm_l1(self) -> Self::Output;
 }
 
 /// Algebra over some base.
@@ -56,28 +56,37 @@ pub trait Algebra<T: Algebra = Self>:
     NormSqr<Output=T>
 {}
 
-impl<T: Float> Conj for T {
-    fn conj(self) -> Self {
-        self
+macro_rules! derive_primitive { ($T:ident) => (
+    impl Conj for $T {
+        fn conj(self) -> Self {
+            self
+        }
     }
-}
-impl<T: Float + Clone> NormSqr for T {
-    type Output = T;
-    fn norm_sqr(self) -> Self {
-        self*self
+    impl NormSqr for $T {
+        type Output = Self;
+        fn norm_sqr(self) -> Self {
+            self*self
+        }
     }
-}
-impl<T: Float> Norm for T {
-    type Output = T;
-    fn norm(self) -> Self {
-        self.abs()
+    impl Norm for $T {
+        type Output = Self;
+        fn norm(self) -> Self {
+            self.abs()
+        }
     }
-}
-impl<T: Float> L1Norm for T {
-    type Output = T;
-    fn l1_norm(self) -> Self {
-        self.abs()
+    impl NormL1 for $T {
+        type Output = Self;
+        fn norm_l1(self) -> Self {
+            self.abs()
+        }
     }
-}
+    impl Algebra for $T {}
+) }
 
-impl<T: Float> Algebra for T {}
+derive_primitive!(i8);
+derive_primitive!(i16);
+derive_primitive!(i32);
+derive_primitive!(i64);
+
+derive_primitive!(f32);
+derive_primitive!(f64);

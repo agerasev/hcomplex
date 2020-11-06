@@ -1,7 +1,9 @@
+#[cfg(feature = "vecmat")]
 mod moebius;
+#[cfg(feature = "vecmat")]
 pub use moebius::*;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "vecmat"))]
 mod tests;
 
 
