@@ -1,7 +1,7 @@
 use core::ops::{Neg, Add, Mul, Div};
-use num_traits::{Zero, One, Num};
+use num_traits::{Zero, One, Num, NumCast};
 use vecmat::matrix::{Matrix2x2, Dot};
-use crate::{Construct, Algebra, transform::*};
+use crate::{*, transform::*};
 
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -83,5 +83,26 @@ impl<U: Neg<Output=U> + Num + Clone> Moebius<U> {
     pub fn normalize(self) -> Self {
         let det = self.det();
         (self.data / det).into()
+    }
+}
+
+impl<T: Algebra + Clone> Deriv<Complex<T>> for Moebius<Complex<T>> {
+    fn deriv(&self, p: Complex<T>) -> Complex<T> {
+        let u: Complex<T> = self.a() * p.clone() + self.b();
+        let d: Complex<T> = self.c() * p + self.d();
+        return (self.a() * d.clone() - u * self.c()) / (d.clone() * d);
+    }
+}
+
+impl<T: NumCast + Algebra + Dot<Output=T> + Clone> DerivDir<Quaternion<T>> for Moebius<Complex<T>> {
+    fn deriv_dir(&self, p: Quaternion<T>, v: Quaternion<T>) -> Quaternion<T> {
+        let u = self.a() * p.clone() + self.b();
+        let d = self.c() * p + self.d();
+        let d2 = d.clone().abs_sqr();
+        let g1 = (self.a() * v.clone()) / d.clone();
+        let g21 = (self.c() * v.clone()).conj();
+        let g22 = d.clone().conj() * (d.dot(self.c() * v) * T::from(2).unwrap() / d2.clone());
+        let g2 = u * ((g21 - g22) / d2);
+        return g1 + g2;
     }
 }
