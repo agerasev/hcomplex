@@ -1,9 +1,7 @@
 mod traits;
 pub use traits::*;
 
-#[cfg(feature = "vecmat")]
 mod moebius;
-#[cfg(feature = "vecmat")]
 pub use moebius::*;
 
 

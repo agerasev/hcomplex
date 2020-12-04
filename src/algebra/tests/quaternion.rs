@@ -3,8 +3,6 @@ use rand_xorshift::XorShiftRng;
 use ::approx::*;
 use crate::{prelude::*, *, random::*};
 
-#[cfg(feature = "vecmat")]
-use vecmat::Dot;
 
 #[cfg(feature = "std")]
 use std::{boxed::Box};
@@ -40,7 +38,6 @@ fn inversion() {
     }
 }
 
-#[cfg(feature = "vecmat")]
 #[test]
 fn law_of_cosines() {
     for _ in 0..SAMPLE_ATTEMPTS {

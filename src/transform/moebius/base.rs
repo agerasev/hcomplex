@@ -1,67 +1,61 @@
 use core::ops::{Neg, Add, Mul, Div};
 use num_traits::{Zero, One, Num, NumCast};
-use vecmat::matrix::{Matrix2x2, Dot};
 use crate::{*, transform::*};
 
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Moebius<U> {
-    data: Matrix2x2<U>,
+    data: [U; 4],
 }
 
-impl<U> From<[[U; 2]; 2]> for Moebius<U> {
-    fn from(array: [[U; 2]; 2]) -> Self {
-        Self { data: Matrix2x2::from(array) }
+impl<U> From<[U; 4]> for Moebius<U> {
+    fn from(array: [U; 4]) -> Self {
+        Self { data: array }
     }
 }
-impl<U> Into<[[U; 2]; 2]> for Moebius<U> {
-    fn into(self) -> [[U; 2]; 2] {
-        self.data.into()
-    }
-}
-impl<U> From<Matrix2x2<U>> for Moebius<U> {
-    fn from(data: Matrix2x2<U>) -> Self {
-        Self { data }
-    }
-}
-impl<U> Into<Matrix2x2<U>> for Moebius<U> {
-    fn into(self) -> Matrix2x2<U> {
+impl<U> Into<[U; 4]> for Moebius<U> {
+    fn into(self) -> [U; 4] {
         self.data
     }
 }
 
 impl<U> Moebius<U> {
     pub fn new(a: U, b: U, c: U, d: U) -> Self {
-        Self::from([[a, b], [c, d]])
+        Self::from([a, b, c, d])
     }
 
-    pub fn a_ref(&self) -> &U { &self.data[(0, 0)] }
-    pub fn b_ref(&self) -> &U { &self.data[(0, 1)] }
-    pub fn c_ref(&self) -> &U { &self.data[(1, 0)] }
-    pub fn d_ref(&self) -> &U { &self.data[(1, 1)] }
+    pub fn a_ref(&self) -> &U { &self.data[0] }
+    pub fn b_ref(&self) -> &U { &self.data[1] }
+    pub fn c_ref(&self) -> &U { &self.data[2] }
+    pub fn d_ref(&self) -> &U { &self.data[3] }
 
-    pub fn a_mut(&mut self) -> &mut U { &mut self.data[(0, 0)] }
-    pub fn b_mut(&mut self) -> &mut U { &mut self.data[(0, 1)] }
-    pub fn c_mut(&mut self) -> &mut U { &mut self.data[(1, 0)] }
-    pub fn d_mut(&mut self) -> &mut U { &mut self.data[(1, 1)] }
+    pub fn a_mut(&mut self) -> &mut U { &mut self.data[0] }
+    pub fn b_mut(&mut self) -> &mut U { &mut self.data[1] }
+    pub fn c_mut(&mut self) -> &mut U { &mut self.data[2] }
+    pub fn d_mut(&mut self) -> &mut U { &mut self.data[3] }
 }
 
 impl<U: Clone> Moebius<U> {
-    pub fn a(&self) -> U { self.data[(0, 0)].clone() }
-    pub fn b(&self) -> U { self.data[(0, 1)].clone() }
-    pub fn c(&self) -> U { self.data[(1, 0)].clone() }
-    pub fn d(&self) -> U { self.data[(1, 1)].clone() }
+    pub fn a(&self) -> U { self.data[0].clone() }
+    pub fn b(&self) -> U { self.data[1].clone() }
+    pub fn c(&self) -> U { self.data[2].clone() }
+    pub fn d(&self) -> U { self.data[3].clone() }
 }
 
 impl<U: Zero + One> Identity for Moebius<U> {
     fn identity() -> Self {
-        Self::from(Matrix2x2::one())
+        Self::new(U::one(), U::zero(), U::zero(), U::one())
     }
 }
 
 impl<U> Chain<U> for Moebius<U> where U: Add<Output=U> + Mul<Output=U> + Div<Output=U> + Clone {
     fn chain(self, other: Self) -> Self {
-        Self::from(Dot::dot(self.data, other.data))
+        Self::new(
+            self.a()*other.a() + self.b()*other.c(),
+            self.a()*other.b() + self.b()*other.d(),
+            self.c()*other.a() + self.d()*other.c(),
+            self.c()*other.b() + self.d()*other.d(),
+        )
     }
 }
 
@@ -78,11 +72,12 @@ impl<T: Algebra + Clone, U: Algebra<T> + Clone> Transform<Construct<T, Construct
 
 impl<U: Neg<Output=U> + Num + Clone> Moebius<U> {
     pub fn det(&self) -> U {
-        self.data.det()
+        self.a()*self.d() - self.b()*self.c()
     }
-    pub fn normalize(self) -> Self {
+    pub fn normalize(mut self) -> Self {
         let det = self.det();
-        (self.data / det).into()
+        self.data.iter_mut().for_each(|x| *x = x.clone() / det.clone());
+        self
     }
 }
 

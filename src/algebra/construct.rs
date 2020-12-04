@@ -6,9 +6,7 @@ use core::{
     marker::PhantomData,
 };
 use num_traits::{Zero, One, Float, Inv, Num};
-use super::traits::{Conj, NormSqr, Norm, NormL1, Algebra};
-
-
+use super::traits::{Conj, Dot, NormSqr, Norm, NormL1, Algebra};
 
 
 /// Cayley–Dickson construction, a basic building block.
@@ -163,6 +161,14 @@ impl<T, U> One for Construct<T, U> where U: Zero + One, Self: Mul<Output=Self> {
 impl<T, U> Construct<T, U> where Self: Clone + Norm<Output=T> + Div<T, Output=Self> {
     pub fn normalize(self) -> Self {
         self.clone() / self.norm()
+    }
+}
+
+impl<T, U> Dot for Construct<T, U> where T: Add<Output=T>, U: Dot<Output=T> {
+    type Output = T;
+    fn dot(self, other: Self) -> T {
+        let (l, r) = (self.split(), other.split());
+        l.0.dot(r.0) + l.1.dot(r.1)
     }
 }
 

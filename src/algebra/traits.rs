@@ -10,6 +10,14 @@ pub trait Conj {
     fn conj(self) -> Self;
 }
 
+/// Dot product.
+pub trait Dot {
+    /// Dot product output type.
+    type Output;
+    /// Perform dot product.
+	fn dot(self, other: Self) -> Self::Output;
+}
+
 /// Square of L2 norm.
 pub trait NormSqr: Sized {
     type Output;
@@ -60,6 +68,12 @@ macro_rules! derive_primitive { ($T:ident) => (
     impl Conj for $T {
         fn conj(self) -> Self {
             self
+        }
+    }
+    impl Dot for $T {
+        type Output = Self;
+        fn dot(self, other: Self) -> Self {
+            self*other
         }
     }
     impl NormSqr for $T {

@@ -10,5 +10,5 @@ pub mod transform;
 
 pub mod prelude {
     pub use num_traits::{One, Zero, Inv};
-    pub use crate::{Conj, NormSqr, Norm, NormL1, Algebra};
+    pub use crate::{Conj, Dot, NormSqr, Norm, NormL1, Algebra};
 }
