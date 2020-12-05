@@ -11,7 +11,7 @@ pub mod random;
 #[cfg(feature = "approx")]
 pub mod approx;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "random", feature = "approx"))]
 mod tests;
 
 

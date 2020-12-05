@@ -1,5 +1,4 @@
-use core::ops::{Neg};
-use num_traits::{Num, Float};
+use num_traits::{Float};
 use rand::Rng;
 use rand_distr::Distribution;
 use crate::*;
@@ -21,9 +20,9 @@ impl<U> Distribution<Moebius<U>> for StandardNormal where StandardNormal: Distri
     }
 }
 
-impl<T: Float, U: NormSqr<Output=T> + Clone> Distribution<Moebius<Construct<T, U>>> for Normalized where
+impl<T: Float + Algebra, U: NormSqr<Output=T> + Clone> Distribution<Moebius<Construct<T, U>>> for Normalized where
     StandardNormal: Distribution<Moebius<Construct<T, U>>>,
-    Construct<T, U>: Neg<Output=Construct<T, U>> + Num
+    Construct<T, U>: Algebra<T>
 {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Moebius<Construct<T, U>> {
         loop {

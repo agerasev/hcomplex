@@ -26,13 +26,15 @@ Lightweight complex and hypercomplex algebra library.
 ## Contents
 
 + Complex and hypercomplex numbers:
-  + `Complex<T>` - 2-dimensional commutative and associative algebra
-  + `Quaternion<T>` - 4-dimensional associative but non-commutative algebra
-  + `Octonion<T>` - 8-dimensional non-commutative and non-associative algebra
-  + `Sedenion<T>` - 16-dimensional non-commutative and non-associative algebra with nontrivial zero divisors
-  + and following algebras created by Cayley-Dickson construction `Construct<T, A<T>>` where `A<T>` is previous algebra
+  + `Complex<T>` - 2-dimensional commutative and associative algebra.
+  + `Quaternion<T>` - 4-dimensional associative but non-commutative algebra.
+  + `Octonion<T>` - 8-dimensional non-commutative and non-associative algebra.
+  + `Sedenion<T>` - 16-dimensional non-commutative and non-associative algebra with nontrivial zero divisors.
+  + and following algebras created by Cayley-Dickson construction `Construct<T, A<T>>` where `A<T>` is previous algebra.
 + Transformations:
-  + `transform::Moebius<T, A<T>>` - Moebius transform, where `A<T>` is some algebra
+  + `transform::Moebius<T, A<T>>` - Moebius transform, where `A<T>` is some algebra.
+
+To construct hypercomplex types from your own type you need to implement `Algebra` trait for it.
 
 ## Crate Features
 

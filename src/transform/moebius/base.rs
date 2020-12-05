@@ -1,5 +1,5 @@
-use core::ops::{Neg, Add, Mul, Div};
-use num_traits::{Zero, One, Num, NumCast};
+use core::ops::{Neg, Add, Sub, Mul, Div};
+use num_traits::{Zero, One, NumCast};
 use crate::{*, transform::*};
 
 
@@ -70,7 +70,7 @@ impl<T: Algebra + Clone, U: Algebra<T> + Clone> Transform<Construct<T, Construct
     }
 }
 
-impl<U: Neg<Output=U> + Num + Clone> Moebius<U> {
+impl<U: Neg<Output=U> + Mul<Output=U> + Div<Output=U> + Sub<Output=U> + Clone> Moebius<U> {
     pub fn det(&self) -> U {
         self.a()*self.d() - self.b()*self.c()
     }

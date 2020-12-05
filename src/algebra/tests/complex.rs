@@ -50,7 +50,7 @@ fn power() {
 
 #[test]
 fn norm() {
-    // TODO: Implement L1 norm.
-    //assert_abs_diff_eq!(Complex::new(-1, 2).l1_norm(), 3.0);
-    assert_abs_diff_eq!(Complex::new(3.0, -4.0).abs(), 5.0);
+    let c = Complex::new(3.0, -4.0);
+    assert_abs_diff_eq!(c.abs(), 5.0);
+    assert_abs_diff_eq!(c.norm_l1(), 7.0);
 }
