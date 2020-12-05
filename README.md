@@ -9,16 +9,16 @@
 
 [crates_badge]: https://img.shields.io/crates/v/hcomplex.svg
 [docs_badge]: https://docs.rs/hcomplex/badge.svg
-[travis_badge]: https://api.travis-ci.org/nthend/hcomplex.svg
-[appveyor_badge]: https://ci.appveyor.com/api/projects/status/github/nthend/hcomplex?branch=master&svg=true
-[codecov_badge]: https://codecov.io/gh/nthend/hcomplex/graphs/badge.svg
+[travis_badge]: https://api.travis-ci.org/agerasev/hcomplex.svg
+[appveyor_badge]: https://ci.appveyor.com/api/projects/status/github/agerasev/hcomplex?branch=master&svg=true
+[codecov_badge]: https://codecov.io/gh/agerasev/hcomplex/graphs/badge.svg
 [license_badge]: https://img.shields.io/crates/l/hcomplex.svg
 
 [crates]: https://crates.io/crates/hcomplex
 [docs]: https://docs.rs/hcomplex
-[travis]: https://travis-ci.org/nthend/hcomplex
-[appveyor]: https://ci.appveyor.com/project/nthend/hcomplex
-[codecov]: https://codecov.io/gh/nthend/hcomplex
+[travis]: https://travis-ci.org/agerasev/hcomplex
+[appveyor]: https://ci.appveyor.com/project/agerasev/hcomplex
+[codecov]: https://codecov.io/gh/agerasev/hcomplex
 [license]: #license
 
 Lightweight complex and hypercomplex algebra library.
