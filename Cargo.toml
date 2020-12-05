@@ -1,6 +1,6 @@
 [package]
 name = "hcomplex"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Alexey Gerasev <alexey.gerasev@gmail.com>"]
 edition = "2018"
 
@@ -14,10 +14,20 @@ categories = ["algorithms", "data-structures", "science"]
 license = "MIT/Apache-2.0"
 
 [dependencies]
-num-traits = "0.2"
-num-complex = "0.2"
+num-traits = { version = "0.2", default-features = false, features = ["libm"] }
+num-complex = { version = "0.3", default-features = false, features = ["libm"] }
+
+rand = { version = "0.7", optional = true }
+rand_distr = { version = "0.3", optional = true }
+approx = { version = "0.4", optional = true }
 
 [dev-dependencies]
-assert_approx_eq = "1.1.0"
-rand = "0.6.5"
-rand_xorshift = "0.1.1"
+rand_xorshift = "0.2"
+
+[features]
+default = ["std"]
+std = ["num-traits/std", "num-complex/std"]
+random = ["rand", "rand_distr"]
+
+[package.metadata.docs.rs]
+features = ["std", "random", "approx"]
